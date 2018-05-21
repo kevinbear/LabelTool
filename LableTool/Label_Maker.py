@@ -329,7 +329,7 @@ class MainPanelCreate():
 				self.BIDListbox.insert(listinsert,self.DataA[listinsert])
 			temptext = self.picturelist[self.flag]
 			if self.flag >= 0:
-				infotext = 'Image Name : '+temptext + '( '+ str(self.flag+=1) +' / '+str(len(self.picturelist))+' )'
+				infotext = 'Image Name : '+temptext + '( '+ str(self.flag+1) +' / '+str(len(self.picturelist))+' )'
 				self.imginfo.set(infotext)
 			elif self.flag < 0:
 				infotext = 'Image Name : '+temptext + '( '+ str(self.flag+len(self.ObjList)+1) +' / '+str(len(self.picturelist))+' )'
