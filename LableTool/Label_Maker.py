@@ -628,9 +628,9 @@ class MainPanelCreate():
 		objstr = self.AttributeAddListbox.get(target)
 		self.boxcolor = objstr.split(':')
 		self.name=self.boxcolor[1].split(',')[0]
-		print('line 594',self.boxcolor)
+		#print('line 594',self.boxcolor)
 		self.classIDandclassname[self.name]=self.boxcolor[2]
-		print('line 596',self.allclassID)
+		#print('line 596',self.allclassID)
 		self.classID[self.name]=self.allclassID[self.name]
 		self.canvas.itemconfig(self.bboxret,outline=self.boxcolor[2])
 		#self.canvas.itemconfig(self.ImageBox[self.boxcount],outline=att[2])
@@ -766,7 +766,7 @@ class MainPanelCreate():
 						for item in tempfile :
 							with open(OutputPathname+'/'+item,'r') as check :#path notice
 								jsondata = json.load(check)
-								# check box status
+								#check box status
 								if len(jsondata[6]) == 0:
 									with open('outlog.txt','a') as log:
 										log.write(item+' object bbox is 0\n')
@@ -776,13 +776,13 @@ class MainPanelCreate():
 									filename = jsondata[1]['IMGName'].split('.')[0]+'.txt'
 									with open(outname+'/'+filename,'a') as label:
 										i = 0 # class number count from 0 start
-										for key,value in jsondata[5].items():
+										for k in range(len(jsondata)-7):
 											i += 1 #jsondata index to fetch object list
 											iteration = jsondata[5+i][0] #get bbox number on key object
 											for bboxcount in range(iteration):
 												coordinate = jsondata[5+i][3+bboxcount]
 												x1,y1,x2,y2 = coordinate[0],coordinate[1],coordinate[2],coordinate[3]
-												label.write(str(value)+' '+str(x1)+' '+str(y1)+' '+str(x2)+' '+str(y2)+'\n')
+												label.write(jsondata[5][jsondata[5+i][1]]+' '+str(x1)+' '+str(y1)+' '+str(x2)+' '+str(y2)+'\n')
 					else :
 						messagebox.showwarning("Warning","Attribute file didn't exist")
 				elif self.OutputFormatSelect[name] == 'yolo':
@@ -805,14 +805,14 @@ class MainPanelCreate():
 									filename = jsondata[1]['IMGName'].split('.')[0]+'.txt'
 									with open(outname+'/'+filename,'a') as label:
 										i = 0 # class number count from 0 start
-										for key,value in jsondata[5].items():
+										for k in range(len(jsondata)-7):
 											i += 1 #jsondata index to fetch object list
 											iteration = jsondata[5+i][0] #get bbox number on key object
 											for bboxcount in range(iteration):
 												coordinate = jsondata[5+i][3+bboxcount]
 												imsize = jsondata[2]['Size']
 												yolotxt = BBox_yolo(coordinate,imsize)
-												label.write(str(value)+' '+yolotxt[0]+' '+yolotxt[0]+' '+yolotxt[0]+' '+yolotxt[0]+'\n')
+												label.write(jsondata[5][jsondata[5+i][1]]+' '+yolotxt[0]+' '+yolotxt[1]+' '+yolotxt[2]+' '+yolotxt[3]+'\n')
 					else:
 						messagebox.showwarning("Warning","Attribute file didn't exist")
 		 #print(Lpath)
