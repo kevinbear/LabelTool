@@ -3,7 +3,7 @@
 - Utilize which programming language/使用的程式語言 ： Python 3.6 
 - Import package/引入的套件 ： os、tkinter、PIL(Image,ImageTk)、functools(partial)、json、shutil 
 - Dependencies/需要套件 : [anaconda3-5.1 (python 3.6)](https://repo.continuum.io/archive/) 
-- Download/下載 : [LabelTool]
+- Download/下載 : [LabelTool](https://github.com/kevinbear/LabelTool)
 
 ## How to use/如何使用: ##
  ### 1. 以下會介紹Label_Maker的畫面與控制方式與按鈕功能 ###
