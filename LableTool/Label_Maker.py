@@ -36,22 +36,22 @@ def IAI(imsize,scalesize,filename,path): # image attribute integration
 	#print(DataAttribute)
 	return DataAttribute
 def BBox_yolo(bbox,imsize):
-    imw = imsize[0]
-    imh = imsize[1]
-    lux = float(bbox[0])
-    luy = float(bbox[1])
-    rdx = float(bbox[2])
-    rdy = float(bbox[3])
-    bbw = rdx - lux #lux -rdx
-    bbh = rdy - luy #luy -rdy
-    centerx = (lux+rdx)/2
-    centery = (luy+rdy)/2
-    x = centerx/imw
-    y = centery/imh
-    w = bbw/imw
-    h = bbh/imh
-    print("lux:{} luy:{} rdx:{} rdy{}:".format(lux,luy,rdx,rdy))
-    return[str(x),str(y),str(w),str(h)]
+	imw = imsize[0]
+	imh = imsize[1]
+	lux = float(bbox[0])
+	luy = float(bbox[1])
+	rdx = float(bbox[2])
+	rdy = float(bbox[3])
+	bbw = rdx - lux #lux -rdx
+	bbh = rdy - luy #luy -rdy
+	centerx = (lux+rdx)/2
+	centery = (luy+rdy)/2
+	x = centerx/imw
+	y = centery/imh
+	w = bbw/imw
+	h = bbh/imh
+	print("lux:{} luy:{} rdx:{} rdy{}:".format(lux,luy,rdx,rdy))
+	return[str(x),str(y),str(w),str(h)]
 #==================================#
 
 #====== Class For Main Panel ======#
