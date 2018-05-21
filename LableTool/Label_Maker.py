@@ -302,7 +302,6 @@ class MainPanelCreate():
 		self.saveImagedata()
 		self.canvas.delete(self.bboxret)
 		self.deleteallbox()
-		self.removeallattribute()
 		self.ImageBox = []
 		self.ImageBoxupLabel = []
 		self.bndboxattribute = []
@@ -346,7 +345,6 @@ class MainPanelCreate():
 		self.saveImagedata()
 		self.canvas.delete(self.bboxret)
 		self.deleteallbox()
-		self.removeallattribute()
 		print(self.ImageBox)
 		self.ImageBox = []
 		self.ImageBoxupLabel = []
@@ -825,6 +823,7 @@ class MainPanelCreate():
 	def GNo(self):
 		self.Gwindow.destroy()
 	def readjson(self):
+		self.deleteallbox()
 		jspath = self.picturelist[self.flag].split('.')[0]
 		jspath = '/'+jspath+'.json'
 		with open(OutputPathname+jspath,'r') as file:
