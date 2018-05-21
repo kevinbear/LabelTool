@@ -823,7 +823,6 @@ class MainPanelCreate():
 	def GNo(self):
 		self.Gwindow.destroy()
 	def readjson(self):
-		self.deleteallbox()
 		jspath = self.picturelist[self.flag].split('.')[0]
 		jspath = '/'+jspath+'.json'
 		with open(OutputPathname+jspath,'r') as file:
@@ -845,6 +844,7 @@ class MainPanelCreate():
 		infotext = 'Image Name : '+temptext + '( '+ str(self.flag+1) +' / '+str(len(self.picturelist))+' )'
 		self.imginfo.set(infotext)
 		# show box attribute on Listbox
+		self.removeallattribute()
 		for key,value in jsdata[4].items():
 			self.AttributeAddListbox.insert(tk.END,'Name:{},Color:{}'.format(key,value))
 			self.classIDandclassname[key]=value
