@@ -61,3 +61,6 @@
 - (7)勾選輸出模式，點選產生，即完成  
  
 ### 6. [Video tutorial](https://www.youtube.com/watch?time_continue=2&v=SLLNUS_MG4w)
+#### Note:
+     - 1. Directory Path --> 資料集的路徑(請不要把照片的檔案名稱也放入)
+     - 2. DataSet --> 資料集的格式請都放入圖片檔(*.png ,*.jpg ,*.JPEG ,*.tif ,etc...)，請不要放入不是圖片檔的檔案格式，否則會有錯誤
