@@ -60,4 +60,4 @@
 - (6)點選下一頁或前一頁繼續框選，直到所有資料集的圖片都匡選完  
 - (7)勾選輸出模式，點選產生，即完成  
  
-### 6. Video tutorial
+### 6. [Video tutorial](https://www.youtube.com/edit?o=U&video_id=SLLNUS_MG4w)
