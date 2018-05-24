@@ -14,18 +14,31 @@ Src = {'initimage':'src/white.png','listformat':'src/list.png','picformat':'src/
 InitAttribute = {'Size':'640 x 480','Scale':'640 x 480','Name':'white.png','Path':'./src/'}
 ImgFormat = ['png','PNG','jpg','JPEG','tif','TIF','pgm','PGM'] #YOU CAN ALSO ADD YOU NEED FORMAT WITH IMAGE
 ImgList = []
+jImgList = []
 OutputPathname = '.attribute'
 Theme = {'bg':'white','fg':'black'}
 #boxcount = 0
 #filter the data is not image format
 def ImgFormatFilter(PicList,path):
 	ImgList.clear()
-	for filter in PicList:
+	jImgList.clear()
+	templist = PicList[:]
+	# filtering the directory
+	print(PicList,type(PicList))
+	for check in PicList:
+		if os.path.isdir(path+check):
+			templist.remove(check)
+	# filtering the file doesn't image
+	for filter in templist:
 		for check in ImgFormat:
 			if filter.split('.',1)[1] == check:
 				ImgList.append(path+filter)
+				jImgList.append(filter)
+	jImgList.sort()
 	ImgList.sort()
-	return ImgList
+	#print(jImgList)
+	#print(ImgList)
+	return ImgList,jImgList
 
 def ScaleRation(imsize):
 	im_w = imsize[0]
@@ -271,8 +284,8 @@ class MainPanelCreate():
 						self.picturelist.remove('.DS_Store')
 				self.picturelist.sort()
 				#print(self.picturelist)
-				self.ObjList = ImgFormatFilter(self.picturelist,self.ObjPath)
-				#print(self.ObjList)
+				self.ObjList,self.picturelist = ImgFormatFilter(self.picturelist,self.ObjPath)
+				#print('objlist:{}\npicturelist:{}'.format(self.ObjList,self.picturelist))
 				self.canvas.bind("<Button-1>",self.mouseClick)
 				self.canvas.bind("<Motion>",self.mouseMove)
 				if not os.path.isdir(OutputPathname): #[.attribute](not exist)
