@@ -941,7 +941,7 @@ class MainPanelCreate():
 #========GUI RUN=========#
 root=tk.Tk()
 root.title('Label Maker')
-root.geometry('1150x600')
+root.geometry('1170x620')
 def on_close():
 	close = messagebox.askokcancel("Close", "Would you like to close the program?")
 	if close:
