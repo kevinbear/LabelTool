@@ -36,9 +36,10 @@
     + getbboxcolor : 抓取鼠標點選屬性時所添加的名稱及顏色。
     + saveImagedata : 儲存每張圖片的所有屬性包含基本資訊、物件名稱、物件顏色、物件ID與物件的各個邊界框位置儲存至".attribute"隱藏屬性資料夾。
     + readjson : 讀取隱藏屬性資料夾並顯示出以標記過圖片的各種資訊。
-
+    ![Label Maker class object 1](./Label_Maker_classobject.png)
 ### 2. Definition function :
   - ImgFormatFilter : 過濾資料夾，並進一步過濾檔案名稱並非圖片的格式。
   - ScaleRation : 計算縮放比例。
   - IAI(image attribute integration) : 圖片資料整合用於顯示基本的圖像資訊於列表(Image Basic Data)上。
   - Box_yolo : 將輸出的格式轉換成yolo格式。
+    ![Label Maker Global function](./global_function.png)
