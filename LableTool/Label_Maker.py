@@ -12,7 +12,7 @@ import shutil as sh
 #=== Global function definition ===#
 Src = {'initimage':'src/white.png','listformat':'src/list.png','picformat':'src/show.png'}
 InitAttribute = {'Size':'640 x 480','Scale':'640 x 480','Name':'white.png','Path':'./src/'}
-ImgFormat = ['png','PNG','jpg','JPEG','tif','TIF','pgm','PGM'] #YOU CAN ALSO ADD YOU NEED FORMAT WITH IMAGE
+ImgFormat = ['png','PNG','jpg','JPG','JPEG','tif','TIF','pgm','PGM'] #YOU CAN ALSO ADD YOU NEED FORMAT WITH IMAGE
 ImgList = []
 jImgList = []
 OutputPathname = '.attribute'
@@ -24,7 +24,7 @@ def ImgFormatFilter(PicList,path):
 	jImgList.clear()
 	templist = PicList[:]
 	# filtering the directory
-	print(PicList,type(PicList))
+	#print(PicList,type(PicList))
 	for check in PicList:
 		if os.path.isdir(path+check):
 			templist.remove(check)
@@ -87,6 +87,7 @@ class MainPanelCreate():
 		self.OutputPath = {'yolo':'YLabel','normal':'NLabel'}
 		self.classcount = 0 #class count
 		self.ObjPath = None
+		self.root = main
 		#==================Main Panel===================#
 		self.MainPanel=tk.Frame(main,bd=10,relief=tk.GROOVE)
 		self.MainPanel.grid(row=0,column =0,sticky = tk.W+tk.E+tk.N+tk.S)
@@ -327,6 +328,8 @@ class MainPanelCreate():
 						self.MaintainB.pack(side=tk.LEFT)
 						self.DeleteDirB.pack(side=tk.RIGHT)
 						self.flag=0
+						self.filecheckbox.grab_set()
+						self.filecheckbox.attributes('-topmost',True)
 					else: # [.attribute](exist) [json file](not exist)
 						self.flag=0
 						self.Objimg = Image.open(self.ObjList[self.flag])
@@ -533,6 +536,7 @@ class MainPanelCreate():
 				self.bboxret = None
 				self.STATE['click'] = 0
 	def addattribute(self): # child window create add new attribute
+		#self.root.withdraw()
 		self.subwindow = tk.Toplevel()
 		self.subwindow.title('Class Attribute')
 		self.subclasslebel = tk.Label(self.subwindow,text='Class Number:')
@@ -545,6 +549,9 @@ class MainPanelCreate():
 		self.subbutton.grid(row=0,column=2)
 		self.subbuttond.grid(row=0,column=3)
 		self.subbuttonc.grid(row=0,column=4)
+		self.subwindow.grab_set()
+		self.subwindow.attributes('-topmost',True)
+		self.classnumber = None
 	def createclass(self):
 		#print('class:{}'.format(self.subspinbox.get()))
 		self.classlabel = []
@@ -557,6 +564,8 @@ class MainPanelCreate():
 		#self.btnclick = []
 		#print(self.classlabel)
 		self.classnumber = int(self.subspinbox.get())
+		if self.classnumber == 0:
+			messagebox.showwarning("Attribute Add Warning","You input 0 class (At least select or input 1 class)!!")
 		for name in range(self.classnumber): #dynamic create Labeel and Entry
 			tempL = tk.Label(self.subwindow,text='Class {} Name:'.format(name))
 			tempE = tk.Entry(self.subwindow,width=5)
@@ -601,34 +610,79 @@ class MainPanelCreate():
 		#self.colorchIndex.append(hx)
 	def deleteclass(self):
 		# use compare to remove unnecessary label and entry
-		for name in range(self.classnumber):
-			#print('==================')
-			self.classlabel[name].destroy()
-			self.classentry[name].destroy()
-			self.classIDlabel[name].destroy()
-			self.classIDentry[name].destroy()
-			self.classcolorlabel[name].destroy()
-			self.classcolorentry[name].destroy()
-			self.classcolorbutton[name].destroy()
+		if self.classnumber == None:
+			messagebox.showwarning("Attribute Add Warning","You must click \"create\" first !!")
+		elif self.classnumber == 0:
+			messagebox.showwarning("Attribute Add Warning","NO class can be delete !!")
+		else:
+			for name in range(self.classnumber):
+				#print('==================')
+				self.classlabel[name].destroy()
+				self.classentry[name].destroy()
+				self.classIDlabel[name].destroy()
+				self.classIDentry[name].destroy()
+				self.classcolorlabel[name].destroy()
+				self.classcolorentry[name].destroy()
+				self.classcolorbutton[name].destroy()
 	def inserlist(self):
 		self.spinboxclassname = []
 		self.spinboxclasscolor = []
 		self.spinboxclassidtemp = []
+		self.insertflag = 0
+		print(' line 632 again')
 		#self.classcount = len(self.allclassID)
-		for getin in range(self.classnumber):
-			self.spinboxclassname.append(self.classentry[getin].get())
-			self.spinboxclasscolor.append(self.classcolorentry[getin].cget("text"))
-			self.spinboxclassidtemp.append(self.classIDentry[getin].get())
-			#print(self.spinboxclassname.append(self.classentry[getin].get()),self.spinboxclasscolor.append(self.classcolorentry[getin].get()))
-		for attinsert in range(self.classnumber):
-			self.AttributeAddListbox.insert(tk.END,'Name:{},Color:{}'.format(self.spinboxclassname[attinsert],self.spinboxclasscolor[attinsert]))
-			self.allclassIDandclassname[self.spinboxclassname[attinsert]]=self.spinboxclasscolor[attinsert]
-			#self.allclassID[self.spinboxclassname[attinsert]] = self.classcount + attinsert
-			self.allclassID[self.spinboxclassname[attinsert]] = self.spinboxclassidtemp[attinsert]
-		print('self.allclassID:',self.allclassID)
-		#print('self.allclassID:',self.allclassID)
-		#print('hello here is classIDandclassname',self.allclassIDandclassname)
-		self.subwindow.destroy()
+		if self.classnumber == None:
+			messagebox.showwarning("Attribute Add Warning","You must click \"create\" first !!")
+		elif self.classnumber == 0:
+			messagebox.showwarning("Attribute Add Warning","You didn't create anyone class !!")
+		else:
+			for getin in range(self.classnumber):
+				# check classname is a digit or nothing in the variable
+				if self.classentry[getin].get() == " " :
+					self.insertflag += 1
+					messagebox.showwarning("classname Warning","Number{} ClassName No input any char !!".format(getin))
+				elif self.classentry[getin].get().isdigit() :
+					self.insertflag += 1
+					self.classentry[getin].delete(0,tk.END)
+					messagebox.showwarning("classname Warning","Number{} ClassName input must be char not number !!".format(getin))
+				else:
+					self.spinboxclassname.append(self.classentry[getin].get())
+				# check classid is a digit or nothing in the variable
+				if self.classIDentry[getin].get() == " " :
+					self.insertflag += 1
+					messagebox.showwarning("classID Warning","Number{} ClassID No input any char !!".format(getin))
+				elif self.classIDentry[getin].get().isdigit() :
+					self.spinboxclassidtemp.append(self.classIDentry[getin].get())
+				elif not self.classIDentry[getin].get().isdigit():
+					self.insertflag += 1
+					self.classIDentry[getin].delete(0,tk.END)
+					messagebox.showwarning("classID Warning","Number{} ClassID input must be number not char !!".format(getin))
+				# check classcolor has selected in the variable
+				if self.classcolorentry[getin].cget("text") == "" :
+					self.insertflag += 1
+					messagebox.showwarning("classcolor Warning","Number{} Classcolor No select any color !!".format(getin))
+				elif self.classcolorentry[getin].cget("text").isdigit():
+					self.insertflag += 1
+					self.classcolorentry[getin].config(text = "")
+					messagebox.showwarning("classID Warning","Number{} ClassID input must be color string not number !!".format(getin))
+				else:
+					self.spinboxclasscolor.append(self.classcolorentry[getin].cget("text"))
+				print('classname:{} , classcolor:{}, classID:{}'.format(self.classentry[getin].get(),self.classcolorentry[getin].cget("text"),self.classIDentry[getin].get()))
+				print(type(self.classentry[getin].get()),type(self.classcolorentry[getin].cget("text")),type(self.classIDentry[getin].get()))
+				# insert real can work label attribute
+				#print(self.spinboxclassname.append(self.classentry[getin].get()),self.spinboxclasscolor.append(self.classcolorentry[getin].get()))
+			if self.insertflag == 0:
+				for attinsert in range(self.classnumber):
+					self.AttributeAddListbox.insert(tk.END,'Name:{},Color:{}'.format(self.spinboxclassname[attinsert],self.spinboxclasscolor[attinsert]))
+					self.allclassIDandclassname[self.spinboxclassname[attinsert]]=self.spinboxclasscolor[attinsert]
+					#self.allclassID[self.spinboxclassname[attinsert]] = self.classcount + attinsert
+					self.allclassID[self.spinboxclassname[attinsert]] = self.spinboxclassidtemp[attinsert]
+				print('self.allclassID:',self.allclassID)
+				#print('self.allclassID:',self.allclassID)
+				#print('hello here is classIDandclassname',self.allclassIDandclassname)
+				self.subwindow.destroy()
+			else:
+				self.insertflag = 0
 	def removeattribute(self):
 		traget = self.AttributeAddListbox.curselection()
 		self.AttributeAddListbox.delete(traget)
@@ -781,7 +835,7 @@ class MainPanelCreate():
 			else :
 				self.Imgdata.append(locals()[key+" attribute"])
 		self.Imgdata.append({'OutputPath':self.OutputPath,'Format':self.OutputFormatSelect})
-		if (self.Imgdata[4] != {}) and (self.Imgdata[5] != {}):
+		if (self.Imgdata[4] != {}) and (self.Imgdata[5] != {}) and (len(self.Imgdata[6]) > 3) :
 			out = self.picturelist[self.flag].split('.')[0]
 			out = '/'+out+'.json'
 			with open(OutputPathname+out,'w') as file:
@@ -809,6 +863,8 @@ class MainPanelCreate():
 			self.Gselect.grid(row=2,column=1,sticky=tk.W)
 			self.GYButton.grid(row=3,column=0)
 			self.GNButton.grid(row=3,column=2)
+			self.Gwindow.grab_set()
+			self.Gwindow.attributes('-topmost',True)
 	def GYes(self):
 		Lpath = []
 		# get all outputpath string
