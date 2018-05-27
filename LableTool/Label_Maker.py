@@ -66,7 +66,7 @@ def BBox_yolo(bbox,imsize):
 	y = centery/imh
 	w = bbw/imw
 	h = bbh/imh
-	print("lux:{} luy:{} rdx:{} rdy{}:".format(lux,luy,rdx,rdy))
+	#print("lux:{} luy:{} rdx:{} rdy{}:".format(lux,luy,rdx,rdy))
 	return[str(x),str(y),str(w),str(h)]
 #==================================#
 
@@ -88,6 +88,8 @@ class MainPanelCreate():
 		self.classcount = 0 #class count
 		self.ObjPath = None
 		self.root = main
+		self.picturelist = None
+		self.ObjList = None
 		#==================Main Panel===================#
 		self.MainPanel=tk.Frame(main,bd=10,relief=tk.GROOVE)
 		self.MainPanel.grid(row=0,column =0,sticky = tk.W+tk.E+tk.N+tk.S)
@@ -140,8 +142,8 @@ class MainPanelCreate():
 		self.DirectoryPathB.grid(row=0,column=2)
 		self.DirectoryPathB1.grid(row=1,column=2,sticky=tk.N)
 		#if want to destroy widgets must declare first and geometry dosen't do both together that will let the widgets not destroy
-		self.PreButton = tk.Button(self.DisplayFrame,width=10,text='<< Prev',command = self.PreLoad,fg=Theme['fg'])
-		self.NextButton = tk.Button(self.DisplayFrame,width=10,text='Next >>',command = self.NextLoad,fg=Theme['fg'])
+		self.PreButton = tk.Button(self.DisplayFrame,width=10,text='<< Prev',fg=Theme['fg'])
+		self.NextButton = tk.Button(self.DisplayFrame,width=10,text='Next >>',fg=Theme['fg'])
 		self.PreButton.grid(row=2,column=0)
 		self.NextButton.grid(row=2,column=2)
 		self.canvas.grid(row=1,column=1,sticky=tk.W+tk.E)
@@ -152,7 +154,8 @@ class MainPanelCreate():
 		self.ImgnameLabel.grid(row=2,column=1)
 		self.ImageJumpLabel = tk.Label(self.DisplayFrame,text='Image No. : ',bg=Theme['bg'],fg=Theme['fg']).grid(row=3,column=0,sticky=tk.E)
 		self.ImageJumpEntry = tk.Entry(self.DisplayFrame,width = 1,bg=Theme['bg'],fg=Theme['fg'])
-		self.ImageJumpButton = tk.Button(self.DisplayFrame,text='Jump',width=10,command = self.ImageJump,fg=Theme['fg']).grid(row=3,column=1,sticky=tk.E)
+		self.ImageJumpButton = tk.Button(self.DisplayFrame,text='Jump',width=10,fg=Theme['fg'])
+		self.ImageJumpButton.grid(row=3,column=1,sticky=tk.E)
 		self.ImageJumpEntry.grid(row=3,column=1,sticky=tk.W)
 		self.DisplayFrame.columnconfigure(0,weight=1)
 		self.DisplayFrame.rowconfigure(0,weight=1)
@@ -178,8 +181,8 @@ class MainPanelCreate():
 		self.BBOXFrame = tk.LabelFrame(self.AttributeOptions,text='Bnding Box',bg=Theme['bg'],fg=Theme['fg'])
 		self.BBOXListbox = tk.Listbox(self.BBOXFrame,width=27,height=6,bg=Theme['bg'],fg=Theme['fg'])
 		#self.BBOXListbox.bind("<<ListboxSelect>>",self.bboxshow)
-		self.BoxRemoveButton = tk.Button(self.BBOXFrame,text='<Del One>',width=10,command= self.removebox,fg=Theme['fg'],relief=tk.FLAT)
-		self.BoxDelallButton = tk.Button(self.BBOXFrame,text='<Del All>',width=10,command=self.deleteallbox,fg=Theme['fg'])
+		self.BoxRemoveButton = tk.Button(self.BBOXFrame,text='<Del One>',width=10,fg=Theme['fg'],relief=tk.FLAT)
+		self.BoxDelallButton = tk.Button(self.BBOXFrame,text='<Del All>',width=10,fg=Theme['fg'])
 		self.BBOXListbox.pack()
 		self.BBOXFrame.grid(row=1,column=0)
 		self.BoxDelallButton.pack(side=tk.LEFT)
@@ -187,8 +190,8 @@ class MainPanelCreate():
 		self.AttributeAddFrame = tk.LabelFrame(self.AttributeOptions,text='Class Attribute Add',bg=Theme['bg'],fg=Theme['fg'])
 		self.AttributeAddListbox = tk.Listbox(self.AttributeAddFrame,width=27,height=5,bg=Theme['bg'],fg=Theme['fg'])
 		self.AttributeAddListbox.bind("<<ListboxSelect>>",self.getbboxcolor)
-		self.AttributeAddButton = tk.Button(self.AttributeAddFrame,text='<Add>',width=5,command = self.addattribute,fg=Theme['fg'])
-		self.AttributeRemoveButton = tk.Button(self.AttributeAddFrame,text='<Remove>',width=9,command= self.removeattribute,fg=Theme['fg'])
+		self.AttributeAddButton = tk.Button(self.AttributeAddFrame,text='<Add>',width=5,fg=Theme['fg'])
+		self.AttributeRemoveButton = tk.Button(self.AttributeAddFrame,text='<Remove>',width=9,fg=Theme['fg'])
 		#self.AttributeAddListbox.insert(1,'Name : {}'.format(InitAttribute['Name']))
 		self.AttributeAddListbox.pack()
 		self.AttributeRemoveButton.pack(side = tk.LEFT)
@@ -197,11 +200,11 @@ class MainPanelCreate():
 		self.FormatOutFrame = tk.LabelFrame(self.AttributeOptions,text='Label Output Format',bg=Theme['bg'],fg=Theme['fg'])
 		self.yolovar = tk.IntVar()
 		self.norvar = tk.IntVar()
-		self.YoloFormat = tk.Checkbutton(self.FormatOutFrame,text='Yolo label',variable=self.yolovar ,onvalue=1 ,offvalue=0,command=self.pathinsert,bg=Theme['bg'],fg=Theme['fg'])
-		self.NormalFormat = tk.Checkbutton(self.FormatOutFrame,text='Normal label',variable=self.norvar ,onvalue=1 ,offvalue=0,command=self.pathinsert,bg=Theme['bg'],fg=Theme['fg'])
+		self.YoloFormat = tk.Checkbutton(self.FormatOutFrame,text='Yolo label',variable=self.yolovar ,onvalue=1 ,offvalue=0,bg=Theme['bg'],fg=Theme['fg'])
+		self.NormalFormat = tk.Checkbutton(self.FormatOutFrame,text='Normal label',variable=self.norvar ,onvalue=1 ,offvalue=0,bg=Theme['bg'],fg=Theme['fg'])
 		self.YoloPathE = tk.Entry(self.FormatOutFrame,width=14,bg=Theme['bg'],fg=Theme['fg'])
 		self.NorPathE = tk.Entry(self.FormatOutFrame,width=14,bg=Theme['bg'],fg=Theme['fg'])
-		self.FileGen = tk.Button(self.FormatOutFrame,text='Gerenate',command=self.gerenatefile,fg=Theme['fg'])
+		self.FileGen = tk.Button(self.FormatOutFrame,text='Gerenate',fg=Theme['fg'])
 		self.YoloFormat.grid(row=0,column=0,sticky=tk.W)
 		self.YoloPathE.grid(row=0,column=1)
 		self.NormalFormat.grid(row=1,column=0)
@@ -229,7 +232,7 @@ class MainPanelCreate():
 	def DeleteDir(self):
 		sh.rmtree(OutputPathname)
 		os.mkdir(OutputPathname)
-		print(OutputPathname,'Remove and Creating ...')
+		#print(OutputPathname,'Remove and Creating ...')
 		self.flag=0
 		self.Objimg = Image.open(self.ObjList[self.flag])
 		self.nsize,self.ration = ScaleRation(self.Objimg.size)
@@ -253,15 +256,28 @@ class MainPanelCreate():
 		self.filecheckbox.destroy()
 	#=== LoadImage definition ===#
 	def SelectPath(self):
-		tp = tk.StringVar()
+		self.picturelist = []
+		self.ObjList = []
+		self.tp = tk.StringVar()
 		path = askdirectory()
 		if path == "":
 			messagebox.showwarning("Warning","Directory entry no path input or select. \n \t\t\tTry again!!")
 		else:
-			tp.set(path)
-			self.DirectoryPathE.config(textvariable=tp)
+			self.tp.set(path)
+			self.DirectoryPathE.config(textvariable=self.tp)
 			self.DirectoryPathB.config(text='Load',command=self.LoadImage)
 			self.DirectoryPathB1.destroy()
+	def att_widgets_function_open(self):
+		self.PreButton.config(command = self.PreLoad)
+		self.NextButton.config(command = self.NextLoad)
+		self.ImageJumpButton.config(command = self.ImageJump)
+		self.BoxRemoveButton.config(command= self.removebox)
+		self.BoxDelallButton.config(command=self.deleteallbox)
+		self.AttributeAddButton.config(command = self.addattribute)
+		self.AttributeRemoveButton.config(command= self.removeattribute)
+		self.YoloFormat.config(command=self.pathinsert)
+		self.NormalFormat.config(command=self.pathinsert)
+		self.FileGen.config(command=self.gerenatefile)
 	def LoadImage(self):
 		self.ImageBox = []
 		self.ImageBoxupLabel = []
@@ -278,6 +294,7 @@ class MainPanelCreate():
 				messagebox.showwarning("Warning","No Such directory :\"{}\"!!".format(self.ObjPath))
 			else: # directory exist
 				self.picturelist = os.listdir(self.ObjPath)
+				#print(self.picturelist)
 				for check in self.picturelist:
 					if check != '.DS_Store':
 						continue
@@ -286,51 +303,21 @@ class MainPanelCreate():
 				self.picturelist.sort()
 				#print(self.picturelist)
 				self.ObjList,self.picturelist = ImgFormatFilter(self.picturelist,self.ObjPath)
-				#print('objlist:{}\npicturelist:{}'.format(self.ObjList,self.picturelist))
-				self.canvas.bind("<Button-1>",self.mouseClick)
-				self.canvas.bind("<Motion>",self.mouseMove)
-				if not os.path.isdir(OutputPathname): #[.attribute](not exist)
-					os.mkdir(OutputPathname)
-					print(OutputPathname,'creating ...')
-					self.flag=0
-					self.Objimg = Image.open(self.ObjList[self.flag])
-					self.nsize,self.ration = ScaleRation(self.Objimg.size)
-					#print(self.nsize)
-					self.show = self.Objimg.resize(self.nsize,Image.ANTIALIAS)
-					self.Objphoto = ImageTk.PhotoImage(self.show)
-					# self.canvas.bind("<Button-1>",self.mouseClick)
-					# self.canvas.bind("<Motion>",self.mouseMove)
-					self.canvas.config(width = self.nsize[0],height=self.nsize[1])
-					self.canvas.itemconfig(self.image_on_canvas, image = self.Objphoto)
-					self.DataA = IAI(self.Objimg.size,self.nsize,self.picturelist[self.flag],self.ObjPath)
-					for listinsert in range(len(self.DataA)):
-						self.BIDListbox.insert(listinsert,self.DataA[listinsert])
-					temptext = self.picturelist[self.flag]
-					infotext = 'Image Name : '+temptext + '( '+ str(self.flag+1) +' / '+str(len(self.picturelist))+' )'
-					self.imginfo.set(infotext)
-					#self.BIDListbox.delete(1)
-					#self.BIDListbox.delete(2)
-					#self.BIDListbox.delete(3)
-					#add new function with display directory images on the right side
-					'''ObjLbel = tk.Label(DisplayFrame,image=Objphoto)
-						ObjLbel.grid(row=1,column=1,sticky=tk.W+tk.E)'''
-				else : # [.attribute](exist)
-					filecheck = os.listdir(OutputPathname)
-					print('filecheck:',len(filecheck))
-					#messagebox.showinfo("showinfo demo", "Info")
-					if len(filecheck) != 0: # [.attribute](exist) [json file](exist)
-						self.filecheckbox = tk.Toplevel()
-						self.filecheckbox.title('Attribute directory status')
-						self.filechecktext = tk.Label(self.filecheckbox,text='Attribute dictery have file\nDo you want to remove all file or maintain the all file',relief=tk.RIDGE)
-						self.MaintainB = tk.Button(self.filecheckbox,text='Maintain',command=self.Maintain)
-						self.DeleteDirB = tk.Button(self.filecheckbox,text='Delete',command=self.DeleteDir)
-						self.filechecktext.pack()
-						self.MaintainB.pack(side=tk.LEFT)
-						self.DeleteDirB.pack(side=tk.RIGHT)
-						self.flag=0
-						self.filecheckbox.grab_set()
-						self.filecheckbox.attributes('-topmost',True)
-					else: # [.attribute](exist) [json file](not exist)
+				if len(self.picturelist) == 0: # represent that this Directory is have not anymore images
+					messagebox.showwarning("Load Image Warning","This directory: '{}' No images file!!".format(self.ObjPath))
+					# clean DirectoryPathE method 1
+					# self.tp.("")
+					# self.DirectoryPathE.config(textvariable=self.tp)
+					# clean DirectoryPathE method 2
+					self.DirectoryPathE.delete(0,tk.END)
+				else: # Directory is have images
+					#print('objlist:{}\npicturelist:{}'.format(self.ObjList,self.picturelist))
+					self.canvas.bind("<Button-1>",self.mouseClick)
+					self.canvas.bind("<Motion>",self.mouseMove)
+					self.att_widgets_function_open()
+					if not os.path.isdir(OutputPathname): #[.attribute](not exist)
+						os.mkdir(OutputPathname)
+						print(OutputPathname,'creating ...')
 						self.flag=0
 						self.Objimg = Image.open(self.ObjList[self.flag])
 						self.nsize,self.ration = ScaleRation(self.Objimg.size)
@@ -353,6 +340,46 @@ class MainPanelCreate():
 						#add new function with display directory images on the right side
 						'''ObjLbel = tk.Label(DisplayFrame,image=Objphoto)
 							ObjLbel.grid(row=1,column=1,sticky=tk.W+tk.E)'''
+					else : # [.attribute](exist)
+						filecheck = os.listdir(OutputPathname)
+						#print('filecheck:',len(filecheck))
+						#messagebox.showinfo("showinfo demo", "Info")
+						if len(filecheck) != 0: # [.attribute](exist) [json file](exist)
+							self.filecheckbox = tk.Toplevel()
+							self.filecheckbox.title('Attribute directory status')
+							self.filechecktext = tk.Label(self.filecheckbox,text='Attribute dictery have file\nDo you want to remove all file or maintain the all file',relief=tk.RIDGE)
+							self.MaintainB = tk.Button(self.filecheckbox,text='Maintain',command=self.Maintain)
+							self.DeleteDirB = tk.Button(self.filecheckbox,text='Delete',command=self.DeleteDir)
+							self.filechecktext.pack()
+							self.MaintainB.pack(side=tk.LEFT)
+							self.DeleteDirB.pack(side=tk.RIGHT)
+							self.flag=0
+							self.filecheckbox.grab_set()
+							self.filecheckbox.attributes('-topmost',True)
+						else: # [.attribute](exist) [json file](not exist)
+							self.flag=0
+							self.Objimg = Image.open(self.ObjList[self.flag])
+							self.nsize,self.ration = ScaleRation(self.Objimg.size)
+							#print(self.nsize)
+							self.show = self.Objimg.resize(self.nsize,Image.ANTIALIAS)
+							self.Objphoto = ImageTk.PhotoImage(self.show)
+							# self.canvas.bind("<Button-1>",self.mouseClick)
+							# self.canvas.bind("<Motion>",self.mouseMove)
+							self.canvas.config(width = self.nsize[0],height=self.nsize[1])
+							self.canvas.itemconfig(self.image_on_canvas, image = self.Objphoto)
+							self.DataA = IAI(self.Objimg.size,self.nsize,self.picturelist[self.flag],self.ObjPath)
+							for listinsert in range(len(self.DataA)):
+								self.BIDListbox.insert(listinsert,self.DataA[listinsert])
+							temptext = self.picturelist[self.flag]
+							infotext = 'Image Name : '+temptext + '( '+ str(self.flag+1) +' / '+str(len(self.picturelist))+' )'
+							self.imginfo.set(infotext)
+							#self.BIDListbox.delete(1)
+							#self.BIDListbox.delete(2)
+							#self.BIDListbox.delete(3)
+							#add new function with display directory images on the right side
+							'''ObjLbel = tk.Label(DisplayFrame,image=Objphoto)
+								ObjLbel.grid(row=1,column=1,sticky=tk.W+tk.E)'''
+		self.DirectoryPathE.delete(0,tk.END)
 		self.DirectoryPathB.config(text='SelectPath',command=self.SelectPath)
 		self.DirectoryPathB1 = tk.Button(self.DisplayFrame,text='Load',width=14,command=self.LoadImage,fg=Theme['fg'])
 		self.DirectoryPathB1.grid(row=1,column=2,sticky=tk.N)
@@ -444,41 +471,52 @@ class MainPanelCreate():
 
 		#=== JumpLoadImage definition ===#
 	def ImageJump(self):
-		self.saveImagedata()
-		self.canvas.delete(self.bboxret)
-		self.deleteallbox()
-		self.removeallattribute()
-		self.ImageBox = []
-		self.ImageBoxupLabel = []
-		self.bndboxattribute = []
-		self.classIDandclassname = {}
-		self.classID = {}
-		self.BIDListbox.delete(0,tk.END) # clean listbox
 		picnumber = self.ImageJumpEntry.get()
-		self.flag = int(picnumber)-1
-		if self.flag <0:
-			self.flag += len(self.ObjList)+1
-		out = self.picturelist[self.flag].split('.')[0]
-		out = '/'+out+'.json'
-		if not os.path.isfile(OutputPathname+out): # check attribute json status (didn't exist)
-			self.Objimg = Image.open(self.ObjList[self.flag])
-			#print("ImageList Index:{}".format(self.flag))
-			self.nsize,self.ration = ScaleRation(self.Objimg.size)
-			#print(self.nsize)
-			self.show = self.Objimg.resize(self.nsize,Image.ANTIALIAS)
-			self.Objphoto = ImageTk.PhotoImage(self.show)
-			self.canvas.config(width = self.nsize[0],height=self.nsize[1])
-			self.canvas.itemconfig(self.image_on_canvas, image = self.Objphoto)
-			self.DataA = IAI(self.Objimg.size,self.nsize,self.picturelist[self.flag],self.ObjPath)
-			for listinsert in range(len(self.DataA)):
-				self.BIDListbox.insert(listinsert,self.DataA[listinsert])
-			temptext = self.picturelist[self.flag]
-			infotext = 'Image Name : '+temptext + '( '+ str(self.flag+1) +' / '+str(len(self.picturelist))+' )'
-			self.imginfo.set(infotext)
-			#ObjLbel = tk.Label(DisplayFrame,image=Objphoto)
-			#ObjLbel.grid(row=1,column=1,sticky=tk.W+tk.E)
+		if picnumber == "":
+			messagebox.showwarning("Load Jump Warning","Jump image number entry no input!!")
+		elif not picnumber.isdigit():
+			messagebox.showwarning("Load Jump Warning","Input must be number!!")
 		else:
-			self.readjson()
+			if int(picnumber) > len(self.picturelist): #check the picnumber is or not out of index
+				messagebox.showwarning("Load Jump Warning","Input number is out of index!!")
+			else:
+				self.saveImagedata()
+				self.canvas.delete(self.bboxret)
+				self.deleteallbox()
+				self.removeallattribute()
+				self.ImageBox = []
+				self.ImageBoxupLabel = []
+				self.bndboxattribute = []
+				self.classIDandclassname = {}
+				self.classID = {}
+				self.BIDListbox.delete(0,tk.END) # clean listbox
+				self.flag = int(picnumber)-1
+				print('self.flag:',self.flag)
+				if self.flag <0:
+					self.flag += len(self.ObjList)
+				print('self.flag:',self.flag)
+				out = self.picturelist[self.flag].split('.')[0]
+				out = '/'+out+'.json'
+				if not os.path.isfile(OutputPathname+out): # check attribute json status (didn't exist)
+					self.Objimg = Image.open(self.ObjList[self.flag])
+					#print("ImageList Index:{}".format(self.flag))
+					self.nsize,self.ration = ScaleRation(self.Objimg.size)
+					#print(self.nsize)
+					self.show = self.Objimg.resize(self.nsize,Image.ANTIALIAS)
+					self.Objphoto = ImageTk.PhotoImage(self.show)
+					self.canvas.config(width = self.nsize[0],height=self.nsize[1])
+					self.canvas.itemconfig(self.image_on_canvas, image = self.Objphoto)
+					self.DataA = IAI(self.Objimg.size,self.nsize,self.picturelist[self.flag],self.ObjPath)
+					for listinsert in range(len(self.DataA)):
+						self.BIDListbox.insert(listinsert,self.DataA[listinsert])
+					temptext = self.picturelist[self.flag]
+					infotext = 'Image Name : '+temptext + '( '+ str(self.flag+1) +' / '+str(len(self.picturelist))+' )'
+					self.imginfo.set(infotext)
+					#ObjLbel = tk.Label(DisplayFrame,image=Objphoto)
+					#ObjLbel.grid(row=1,column=1,sticky=tk.W+tk.E)
+				else:
+					self.readjson()
+			self.ImageJumpEntry.delete(0,tk.END)
 		#============================#
 	def mouseClick(self,event):
 		if (len(self.classIDandclassname) == 0) and (self.Objphoto != None):
@@ -629,7 +667,7 @@ class MainPanelCreate():
 		self.spinboxclasscolor = []
 		self.spinboxclassidtemp = []
 		self.insertflag = 0
-		print(' line 632 again')
+		#print(' line 632 again')
 		#self.classcount = len(self.allclassID)
 		if self.classnumber == None:
 			messagebox.showwarning("Attribute Add Warning","You must click \"create\" first !!")
@@ -685,42 +723,48 @@ class MainPanelCreate():
 				self.insertflag = 0
 	def removeattribute(self):
 		traget = self.AttributeAddListbox.curselection()
-		self.AttributeAddListbox.delete(traget)
-		self.allclassIDandclassname.pop(self.name)
-		#self.allclassID.pop(self.name)
-		self.allclassID.pop(self.name)
-		#index = 0
-		# for reset in self.allclassID:
-		# 	self.allclassID[reset] = index
-		# 	index += 1
-		# print('self.allclassID:',self.allclassID)
-		#print(self.allclassIDandclassname)
-		self.classnumber -=1
-		self.boxcolor = None
-		self.name = None
+		if not traget:
+			messagebox.showwarning("Attribute Remove Warning","You didn't select any Attribute !!")
+		else:
+			self.AttributeAddListbox.delete(traget)
+			self.allclassIDandclassname.pop(self.name)
+			#self.allclassID.pop(self.name)
+			self.allclassID.pop(self.name)
+			#index = 0
+			# for reset in self.allclassID:
+			# 	self.allclassID[reset] = index
+			# 	index += 1
+			# print('self.allclassID:',self.allclassID)
+			#print(self.allclassIDandclassname)
+			self.classnumber -=1
+			self.boxcolor = None
+			self.name = None
 	def removeallattribute(self):
 		size = self.AttributeAddListbox.size()
 		for plugout in range(size):
 			self.AttributeAddListbox.delete(0)
 	def removebox(self):
 		traget = self.BBOXListbox.curselection()
-		#print(traget)
+		print(traget)
 		#print(self.BBOXListbox.get(traget))
-		self.BBOXListbox.delete(traget,tk.END)# delete all listbox box position
-		self.canvas.delete(self.ImageBox[traget[0]])# delete traget canvas bbox rectangle
-		self.canvas.delete(self.ImageBoxupLabel[traget[0]]) # delete traget canvas label on rectangle
-		#print('original:{}\nscale:{}'.format(self.bndboxlist,self.ImageBox))
-		self.ImageBox.pop(traget[0]) # pop traget from ImageBox
-		self.ImageBoxupLabel.pop(traget[0]) # pop traget from ImageBoxupLabel
-		self.bndboxlist.pop(traget[0]) # pop traget from bndboxlist
-		self.bndboxattribute.pop(traget[0])
-		#print('original:{}\nscale:{}'.format(self.bndboxlist,self.ImageBox))
-		#print(self.bndboxattribute)
-		self.boxcount -=1
-		#insert the new list to listbox
-		for reassign in range(traget[0],self.boxcount):
-			self.BBOXListbox.insert(tk.END,'BOX{} :[LP:{},{} --> RD:{},{}]'.format(reassign,self.bndboxlist[reassign][0],self.bndboxlist[reassign][1],self.bndboxlist[reassign][2],self.bndboxlist[reassign][3]))
-		print(self.ImageBox)
+		if not traget:
+			messagebox.showwarning("Bounding Box Delete Warning","You didn't select any bounding box coordinate !!")
+		else:
+			self.BBOXListbox.delete(traget,tk.END)# delete all listbox box position
+			self.canvas.delete(self.ImageBox[traget[0]])# delete traget canvas bbox rectangle
+			self.canvas.delete(self.ImageBoxupLabel[traget[0]]) # delete traget canvas label on rectangle
+			#print('original:{}\nscale:{}'.format(self.bndboxlist,self.ImageBox))
+			self.ImageBox.pop(traget[0]) # pop traget from ImageBox
+			self.ImageBoxupLabel.pop(traget[0]) # pop traget from ImageBoxupLabel
+			self.bndboxlist.pop(traget[0]) # pop traget from bndboxlist
+			self.bndboxattribute.pop(traget[0])
+			#print('original:{}\nscale:{}'.format(self.bndboxlist,self.ImageBox))
+			#print(self.bndboxattribute)
+			self.boxcount -=1
+			#insert the new list to listbox
+			for reassign in range(traget[0],self.boxcount):
+				self.BBOXListbox.insert(tk.END,'BOX{} :[LP:{},{} --> RD:{},{}]'.format(reassign,self.bndboxlist[reassign][0],self.bndboxlist[reassign][1],self.bndboxlist[reassign][2],self.bndboxlist[reassign][3]))
+			#print(self.ImageBox)
 	def deleteallbox(self):
 		self.bndboxlist=[]#reset to none
 		self.bndboxattribute = [] #reset to none
@@ -738,19 +782,26 @@ class MainPanelCreate():
 		#print('bndboxlist:{}\nboxcount:{}'.format(self.bndboxlist,self.boxcount))
 	def getbboxcolor(self,event):
 		target = event.widget.curselection()
+		#print('bingo line 785',target)
 		#print(target[0],type(target)) tuple can slice
-		objstr = self.AttributeAddListbox.get(target)
-		self.boxcolor = objstr.split(':')
-		self.name=self.boxcolor[1].split(',')[0]
-		#print('line 594',self.boxcolor)
-		self.classIDandclassname[self.name]=self.boxcolor[2]
-		#print('line 596',self.allclassID)
-		self.classID[self.name]=self.allclassID[self.name]
-		self.canvas.itemconfig(self.bboxret,outline=self.boxcolor[2])
-		#self.canvas.itemconfig(self.ImageBox[self.boxcount],outline=att[2])
-		#change canvas bunbox color attribute
-		#target = self.AttributeAddListbox.curselection()
+		if not target :
+			messagebox.showwarning("Bounding Box Select Warning","You didn't add attribute or not selected any attribute !!")
+		else:
+			objstr = self.AttributeAddListbox.get(target)
+			self.boxcolor = objstr.split(':')
+			self.name=self.boxcolor[1].split(',')[0]
+			#print('line 594',self.boxcolor)
+			self.classIDandclassname[self.name]=self.boxcolor[2]
+			#print('line 596',self.allclassID)
+			self.classID[self.name]=self.allclassID[self.name]
+			self.canvas.itemconfig(self.bboxret,outline=self.boxcolor[2])
+			#self.canvas.itemconfig(self.ImageBox[self.boxcount],outline=att[2])
+			#change canvas bunbox color attribute
+			#target = self.AttributeAddListbox.curselection()
 	def pathinsert(self):
+		self.OutputPath = {'yolo':'YLabel','normal':'NLabel'}
+		self.outdir = tk.StringVar()
+		self.outselect = tk.StringVar()
 		if (self.yolovar.get() == 1 ) & (self.norvar.get() == 0):
 			self.OutputFormatSelect=[]
 			self.OutputFormatSelect.append('yolo')
@@ -761,6 +812,8 @@ class MainPanelCreate():
 				self.OutputPath['yolo'] = self.YoloPathE.get()
 				print('yolo path:{}'.format(self.OutputPath['yolo']))
 			#print(self.OutputFormatSelect)
+			self.outselect.set('Label select format: {}'.format(self.OutputFormatSelect[0]))
+			self.outdir.set('Output directory: {}'.format(self.OutputPath[self.OutputFormatSelect[0]]))
 		elif (self.yolovar.get() == 0 ) & (self.norvar.get() == 1):
 			self.OutputFormatSelect=[]
 			self.OutputFormatSelect.append('normal')
@@ -770,6 +823,8 @@ class MainPanelCreate():
 				self.OutputPath['normal'] = self.NorPathE.get()
 				#print('normal path:{}'.format(self.OutputPath['normal']))
 			#print(self.OutputFormatSelect)
+			self.outselect.set('Label select format: {}'.format(self.OutputFormatSelect[0]))
+			self.outdir.set('Output directory: {}'.format(self.OutputPath[self.OutputFormatSelect[0]]))
 		elif (self.yolovar.get() == 1 ) & (self.norvar.get() == 1):
 			self.OutputFormatSelect=[]
 			self.OutputFormatSelect.append('yolo')
@@ -787,6 +842,8 @@ class MainPanelCreate():
 				self.OutputPath['normal'] = self.NorPathE.get()
 				#print('yolo path:{}\nnormal path:{}'.format(self.OutputPath['yolo'],self.OutputPath['normal']))
 			#print(self.OutputFormatSelect)
+			self.outselect.set('Label select format: {},{}'.format(self.OutputFormatSelect[0],self.OutputFormatSelect[1]))
+			self.outdir.set('Output directory: {},{}'.format(self.OutputPath[self.OutputFormatSelect[0]],self.OutputPath[self.OutputFormatSelect[1]]))
 		else :
 			self.OutputFormatSelect=[]
 			#print('nothing to select')
@@ -849,22 +906,24 @@ class MainPanelCreate():
 				attributefile = os.listdir(OutputPathname)
 				attributefile.sort()
 				#print(attributefile)
+				self.Gwindow = tk.Toplevel()
+				self.Gwindow.title('Gerenate Output')
+				self.Glabel = tk.Label(self.Gwindow,text='Gerenate:')
+				self.Gshow = tk.Label(self.Gwindow,text='Totall alreadly labeled file number : {}'.format(len(attributefile)))
+				self.Gselect = tk.Label(self.Gwindow,textvariable=self.outselect)
+				self.Goutput = tk.Label(self.Gwindow,textvariable=self.outdir)
+				self.GYButton = tk.Button(self.Gwindow,text='Yes',command=self.GYes,width=8)
+				self.GNButton = tk.Button(self.Gwindow,text='No',command=self.GNo,width=8)
+				self.Glabel.grid(row=0,column=0,sticky=tk.W)
+				self.Gshow.grid(row=1,column=1)
+				self.Gselect.grid(row=2,column=1,sticky=tk.W)
+				self.Goutput.grid(row=3,column=1,sticky=tk.W)
+				self.GYButton.grid(row=4,column=0)
+				self.GNButton.grid(row=4,column=2)
+				self.Gwindow.grab_set()
+				self.Gwindow.attributes('-topmost',True)
 			else:
 				messagebox.showwarning("attribute folder status","Attributefile doesn't exist !!")
-			self.Gwindow = tk.Toplevel()
-			self.Gwindow.title('Gerenate Output')
-			self.Glabel = tk.Label(self.Gwindow,text='Gerenate:')
-			self.Gshow = tk.Label(self.Gwindow,text='From [{}] to [{}] \nTotall file number {}'.format(attributefile[0],attributefile[-1],len(attributefile)))
-			self.Gselect = tk.Label(self.Gwindow,text='label select{}'.format(self.OutputFormatSelect))
-			self.GYButton = tk.Button(self.Gwindow,text='Yes',command=self.GYes,width=5)
-			self.GNButton = tk.Button(self.Gwindow,text='No',command=self.GNo,width=5)
-			self.Glabel.grid(row=0,column=1,sticky=tk.W)
-			self.Gshow.grid(row=1,column=1)
-			self.Gselect.grid(row=2,column=1,sticky=tk.W)
-			self.GYButton.grid(row=3,column=0)
-			self.GNButton.grid(row=3,column=2)
-			self.Gwindow.grab_set()
-			self.Gwindow.attributes('-topmost',True)
 	def GYes(self):
 		Lpath = []
 		# get all outputpath string
@@ -1004,8 +1063,11 @@ def on_close():
 		if not control.ObjPath:
 			root.destroy()
 		else:
-			control.saveImagedata()
-			root.destroy()
+			if len(control.picturelist) == 0:
+				root.destroy()
+			else:
+				control.saveImagedata()
+				root.destroy()
 root.protocol("WM_DELETE_WINDOW",  on_close)
 control = MainPanelCreate(root)
 root.columnconfigure(0,weight=1)
