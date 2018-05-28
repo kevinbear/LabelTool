@@ -90,6 +90,7 @@ class MainPanelCreate():
 		self.root = main
 		self.picturelist = None
 		self.ObjList = None
+		self.boxcolor = None
 		#==================Main Panel===================#
 		self.MainPanel=tk.Frame(main,bd=10,relief=tk.GROOVE)
 		self.MainPanel.grid(row=0,column =0,sticky = tk.W+tk.E+tk.N+tk.S)
@@ -178,7 +179,7 @@ class MainPanelCreate():
 		self.BIDListbox.insert(4,'Path : {}'.format(InitAttribute['Path']))
 		self.BIDListbox.pack()
 		self.BasicImageData.grid(row=0,column=0)
-		self.BBOXFrame = tk.LabelFrame(self.AttributeOptions,text='Bnding Box',bg=Theme['bg'],fg=Theme['fg'])
+		self.BBOXFrame = tk.LabelFrame(self.AttributeOptions,text='Bounding Box',bg=Theme['bg'],fg=Theme['fg'])
 		self.BBOXListbox = tk.Listbox(self.BBOXFrame,width=27,height=6,bg=Theme['bg'],fg=Theme['fg'])
 		#self.BBOXListbox.bind("<<ListboxSelect>>",self.bboxshow)
 		self.BoxRemoveButton = tk.Button(self.BBOXFrame,text='<Del One>',width=10,fg=Theme['fg'],relief=tk.FLAT)
@@ -227,8 +228,26 @@ class MainPanelCreate():
 	def Maintain(self):
 		# self.canvas.bind("<Button-1>",self.mouseClick)
 		# self.canvas.bind("<Motion>",self.mouseMove)
-		self.readjson()
-		self.filecheckbox.destroy()
+		out = self.picturelist[self.flag].split('.')[0]
+		out = '/'+out+'.json'
+		if not os.path.isfile(OutputPathname+out):
+			self.Objimg = Image.open(self.ObjList[self.flag])
+			self.nsize,self.ration = ScaleRation(self.Objimg.size)
+			#print(self.nsize)
+			self.show = self.Objimg.resize(self.nsize,Image.ANTIALIAS)
+			self.Objphoto = ImageTk.PhotoImage(self.show)
+			self.canvas.config(width = self.nsize[0],height=self.nsize[1])
+			self.canvas.itemconfig(self.image_on_canvas, image = self.Objphoto)
+			self.DataA = IAI(self.Objimg.size,self.nsize,self.picturelist[self.flag],self.ObjPath)
+			for listinsert in range(len(self.DataA)):
+				self.BIDListbox.insert(listinsert,self.DataA[listinsert])
+			temptext = self.picturelist[self.flag]
+			infotext = 'Image Name : '+temptext + '( '+ str(self.flag+1) +' / '+str(len(self.picturelist))+' )'
+			self.imginfo.set(infotext)
+			self.filecheckbox.destroy()
+		else:
+			self.readjson()
+			self.filecheckbox.destroy()
 	def DeleteDir(self):
 		sh.rmtree(OutputPathname)
 		os.mkdir(OutputPathname)
@@ -396,6 +415,7 @@ class MainPanelCreate():
 		self.classIDandclassname = {}
 		self.classID = {}
 		self.BIDListbox.delete(0,tk.END) #clean listbox
+		self.boxcolor = None
 		if self.flag == -len(self.ObjList):
 			self.flag = 0
 		else:
@@ -440,6 +460,7 @@ class MainPanelCreate():
 		self.classIDandclassname = {}
 		self.classID = {}
 		self.BIDListbox.delete(0,tk.END) # clean listbox
+		self.boxcolor = None
 		if self.flag == len(self.ObjList)-1:
 			self.flag =0
 		else:
@@ -490,6 +511,7 @@ class MainPanelCreate():
 				self.classIDandclassname = {}
 				self.classID = {}
 				self.BIDListbox.delete(0,tk.END) # clean listbox
+				self.boxcolor = None
 				self.flag = int(picnumber)-1
 				print('self.flag:',self.flag)
 				if self.flag <0:
@@ -519,7 +541,10 @@ class MainPanelCreate():
 			self.ImageJumpEntry.delete(0,tk.END)
 		#============================#
 	def mouseClick(self,event):
-		if (len(self.classIDandclassname) == 0) and (self.Objphoto != None):
+		if (len(self.classIDandclassname) == 0) and (self.Objphoto != None) :
+			messagebox.showwarning("Warning","You must to create classes and click the attribute")
+			self.STATE['click'] = 2
+		if self.boxcolor == None:
 			messagebox.showwarning("Warning","You must to create classes and click the attribute")
 			self.STATE['click'] = 2
 		if self.STATE['click'] == 0: # recode position original
@@ -530,10 +555,12 @@ class MainPanelCreate():
 			y1,y2 = min(self.STATE['y'],event.y),max(self.STATE['y'],event.y)
 			retangleo = x1,y1,x2,y2
 			#print('x:{},y:{}'.format(event.x,event.y))
-			if self.ration > 1 : #scale up
+			if self.ration > 1 : #ratio is scale up --> canvas coordinate must be scale down
+				print('line 559 down',self.ration)
 				retangle= int(retangleo[0]/self.ration),int(retangleo[1]/self.ration),int(retangleo[2]/self.ration),int(retangleo[3]/self.ration)
-			elif self.ration < 1: #scale down
-				retangle= int(retangleo[0]*self.ration),int(retangleo[1]*self.ration),int(retangleo[2]*self.ration),int(retangleo[3]*self.ration)
+			elif self.ration < 1: #ratio is scale down --> canvas coordinate must be scale up
+				print('line 562 up',self.ration)
+				retangle= int(retangleo[0]/self.ration),int(retangleo[1]/self.ration),int(retangleo[2]/self.ration),int(retangleo[3]/self.ration)
 			else: # no resize
 				retangle = retangleo
 			self.bndboxlist.append(retangle)
@@ -750,6 +777,9 @@ class MainPanelCreate():
 		if not traget:
 			messagebox.showwarning("Bounding Box Delete Warning","You didn't select any bounding box coordinate !!")
 		else:
+			if self.bboxret:
+				#print('################3###############')
+				self.canvas.delete(self.bboxret)
 			self.BBOXListbox.delete(traget,tk.END)# delete all listbox box position
 			self.canvas.delete(self.ImageBox[traget[0]])# delete traget canvas bbox rectangle
 			self.canvas.delete(self.ImageBoxupLabel[traget[0]]) # delete traget canvas label on rectangle
@@ -766,8 +796,8 @@ class MainPanelCreate():
 				self.BBOXListbox.insert(tk.END,'BOX{} :[LP:{},{} --> RD:{},{}]'.format(reassign,self.bndboxlist[reassign][0],self.bndboxlist[reassign][1],self.bndboxlist[reassign][2],self.bndboxlist[reassign][3]))
 			#print(self.ImageBox)
 	def deleteallbox(self):
-		self.bndboxlist=[]#reset to none
-		self.bndboxattribute = [] #reset to none
+		#self.bndboxlist=[]#reset to none
+		#self.bndboxattribute = [] #reset to none
 		#print('====5====',self.boxcount)
 		size = self.BBOXListbox.size()
 		#print('listbox size:',size)
@@ -775,6 +805,8 @@ class MainPanelCreate():
 			self.BBOXListbox.delete(0)
 			self.canvas.delete(self.ImageBox[0])
 			self.canvas.delete(self.ImageBoxupLabel[0])
+			self.bndboxattribute.pop(0)
+			self.bndboxlist.pop(0)
 			self.ImageBox.pop(0)
 			self.ImageBoxupLabel.pop(0)
 			#print(self.ImageBox)
@@ -879,6 +911,7 @@ class MainPanelCreate():
 		# classfication per class
 		for key,value in self.classIDandclassname.items():
 			locals()[key+" attribute"] = [0,key,value]
+		#print('line 912',self.bndboxattribute)
 		for clsficat in self.bndboxattribute:
 			for key,value in self.classIDandclassname.items():
 				if (clsficat[0] == key) & (clsficat[1] == value):
@@ -892,12 +925,21 @@ class MainPanelCreate():
 			else :
 				self.Imgdata.append(locals()[key+" attribute"])
 		self.Imgdata.append({'OutputPath':self.OutputPath,'Format':self.OutputFormatSelect})
+		#print('line 926',self.Imgdata)
 		if (self.Imgdata[4] != {}) and (self.Imgdata[5] != {}) and (len(self.Imgdata[6]) > 3) :
 			out = self.picturelist[self.flag].split('.')[0]
 			out = '/'+out+'.json'
 			with open(OutputPathname+out,'w') as file:
 				self.text=json.dumps(self.Imgdata,indent = 2)
 				file.write(self.text)
+		else: #erase the json file
+			try:
+				out = self.picturelist[self.flag].split('.')[0]
+				out = '/'+out+'.json'
+				os.remove(OutputPathname+out)
+			except FileNotFoundError :
+				pass
+				#messagebox.showwarning("Save json file Warning","File:'{}' will not be save !!".format(out))
 	def gerenatefile(self):
 		if len(self.OutputFormatSelect) == 0:
 			messagebox.showwarning("Outpu Path Warning","You do not select output format")
@@ -1003,7 +1045,7 @@ class MainPanelCreate():
 		with open(OutputPathname+jspath,'r') as file:
 			jsdata = json.load(file)
 		photo = jsdata[0]['Path']+jsdata[1]['IMGName']
-		ratio = jsdata[2]['Size'][0]/jsdata[3]['Scale'][0]
+		ratio = jsdata[3]['Scale'][0]/jsdata[2]['Size'][0]
 		self.Objimg = Image.open(photo)
 		#print("ImageList Index:{}".format(self.flag))
 		self.nsize,self.ration = ScaleRation(self.Objimg.size)
@@ -1019,6 +1061,7 @@ class MainPanelCreate():
 		infotext = 'Image Name : '+temptext + '( '+ str(self.flag+1) +' / '+str(len(self.picturelist))+' )'
 		self.imginfo.set(infotext)
 		# show box attribute on Listbox
+		self.boxcount = jsdata[6][0]
 		self.removeallattribute()
 		for key,value in jsdata[4].items():
 			self.AttributeAddListbox.insert(tk.END,'Name:{},Color:{}'.format(key,value))
@@ -1032,10 +1075,10 @@ class MainPanelCreate():
 			color = jsdata[object+6][2]
 			self.name = jsdata[object+6][1]
 			for box in range(len(jsdata[object+6])-3):
-				if ratio > 1:
+				if ratio > 1: # scale up --> original box size scale up
 					retangle = int(jsdata[object+6][3+box][0]*ratio),int(jsdata[object+6][3+box][1]*ratio),int(jsdata[object+6][3+box][2]*ratio),int(jsdata[object+6][3+box][3]*ratio)
-				elif ratio < 1:
-					retangle = int(jsdata[object+6][3+box][0]/ratio),int(jsdata[object+6][3+box][1]/ratio),int(jsdata[object+6][3+box][2]/ratio),int(jsdata[object+6][3+box][3]/ratio)
+				elif ratio < 1: # scale down --> original box size scale down
+					retangle = int(jsdata[object+6][3+box][0]*ratio),int(jsdata[object+6][3+box][1]*ratio),int(jsdata[object+6][3+box][2]*ratio),int(jsdata[object+6][3+box][3]*ratio)
 				else:
 					retangle = jsdata[object+6][3+box][0],jsdata[object+6][3+box][1],jsdata[object+6][3+box][2],jsdata[object+6][3+box][3]
 				print('jsretangle:{}'.format(jsdata[object+6][3+box]))
