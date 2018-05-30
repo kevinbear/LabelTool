@@ -1,3 +1,4 @@
+#for mac os
 import cx_Freeze as cf
 executables = [cf.Executable("/Users/kevinkuo/Documents/GitHub/LabelTool/LableTool/Label_Maker.py")]
 
