@@ -184,7 +184,7 @@ class MainPanelCreate():
 		self.BBOXFrame = tk.LabelFrame(self.AttributeOptions,text='Bounding Box',bg=Theme['bg'],fg=Theme['fg'])
 		self.BBOXListbox = tk.Listbox(self.BBOXFrame,width=27,height=6,bg=Theme['bg'],fg=Theme['fg'])
 		#self.BBOXListbox.bind("<<ListboxSelect>>",self.bboxshow)
-		self.BoxRemoveButton = tk.Button(self.BBOXFrame,text='<Del One>',width=10,fg=Theme['fg'],relief=tk.FLAT)
+		self.BoxRemoveButton = tk.Button(self.BBOXFrame,text='<Del One>',width=10,fg=Theme['fg'])
 		self.BoxDelallButton = tk.Button(self.BBOXFrame,text='<Del All>',width=10,fg=Theme['fg'])
 		self.BBOXListbox.pack()
 		self.BBOXFrame.grid(row=1,column=0)
@@ -508,8 +508,10 @@ class MainPanelCreate():
 		picnumber = self.ImageJumpEntry.get()
 		if picnumber == "":
 			messagebox.showwarning("Load Jump Warning","Jump image number entry no input!!")
+			self.ImageJumpEntry.delete(0,tk.END)
 		elif not picnumber.isdigit():
 			messagebox.showwarning("Load Jump Warning","Input must be number!!")
+			self.ImageJumpEntry.delete(0,tk.END)
 		else:
 			if int(picnumber) > len(self.picturelist): #check the picnumber is or not out of index
 				messagebox.showwarning("Load Jump Warning","Input number is out of index!!")
@@ -1048,6 +1050,8 @@ class MainPanelCreate():
 				print('keyError from GYes')
 			self.Gwindow.destroy()
 						#check object
+		self.YoloPathE.delete(0,tk.END)
+		self.NorPathE.delete(0,tk.END)
 	def GNo(self):
 		self.Gwindow.destroy()
 	def readjson(self):
