@@ -91,6 +91,8 @@ class MainPanelCreate():
 		self.picturelist = None
 		self.ObjList = None
 		self.boxcolor = None
+		self.ImageBox = []
+		self.ImageBoxupLabel = []
 		#==================Main Panel===================#
 		self.MainPanel=tk.Frame(main,bd=10,relief=tk.GROOVE)
 		self.MainPanel.grid(row=0,column =0,sticky = tk.W+tk.E+tk.N+tk.S)
@@ -275,6 +277,8 @@ class MainPanelCreate():
 		self.filecheckbox.destroy()
 	#=== LoadImage definition ===#
 	def SelectPath(self):
+		if self.Objphoto != None:
+			self.saveImagedata()
 		self.picturelist = []
 		self.ObjList = []
 		self.tp = tk.StringVar()
@@ -298,8 +302,6 @@ class MainPanelCreate():
 		self.NormalFormat.config(command=self.pathinsert)
 		self.FileGen.config(command=self.gerenatefile)
 	def LoadImage(self):
-		self.ImageBox = []
-		self.ImageBoxupLabel = []
 		#self.AttributeAddListbox.delete(0)
 		#if not self.DirectoryPathE.get()
 		self.ObjPath=self.DirectoryPathE.get()
@@ -307,7 +309,6 @@ class MainPanelCreate():
 		if not self.ObjPath: # [path](not input)
 			messagebox.showwarning("Warning","Directory entry no path input or select!!")
 		else:# [path](have input)
-			self.BIDListbox.delete(0,tk.END)
 			self.ObjPath = self.ObjPath+'/'
 			if not os.path.isdir(self.ObjPath):# directory not exist
 				messagebox.showwarning("Warning","No Such directory :\"{}\"!!".format(self.ObjPath))
@@ -331,6 +332,11 @@ class MainPanelCreate():
 					self.DirectoryPathE.delete(0,tk.END)
 				else: # Directory is have images
 					#print('objlist:{}\npicturelist:{}'.format(self.ObjList,self.picturelist))
+					if self.bboxret:
+						self.canvas.delete(self.bboxret)
+					self.BIDListbox.delete(0,tk.END)
+					self.removeallattribute()
+					self.deleteallbox()
 					self.canvas.bind("<Button-1>",self.mouseClick)
 					self.canvas.bind("<Motion>",self.mouseMove)
 					self.att_widgets_function_open()
@@ -363,6 +369,11 @@ class MainPanelCreate():
 						filecheck = os.listdir(OutputPathname)
 						#print('filecheck:',len(filecheck))
 						#messagebox.showinfo("showinfo demo", "Info")
+						for check in filecheck:
+							if check != '.DS_Store':
+								continue
+							elif check == '.DS_Store':
+								filecheck.remove('.DS_Store')
 						if len(filecheck) != 0: # [.attribute](exist) [json file](exist)
 							self.filecheckbox = tk.Toplevel()
 							self.filecheckbox.title('Attribute directory status')
@@ -407,10 +418,11 @@ class MainPanelCreate():
 		#=== PreLoadImage definition ===#
 	def PreLoad(self):
 		self.saveImagedata()
-		self.canvas.delete(self.bboxret)
+		if self.bboxret:
+			self.canvas.delete(self.bboxret)
 		self.deleteallbox()
-		self.ImageBox = []
-		self.ImageBoxupLabel = []
+		self.ImageBox.clear()
+		self.ImageBoxupLabel.clear()
 		self.bndboxattribute = []
 		self.classIDandclassname = {}
 		self.classID = {}
@@ -451,11 +463,12 @@ class MainPanelCreate():
 	#=== NextLoadImage definition ===#
 	def NextLoad(self):
 		self.saveImagedata()
-		self.canvas.delete(self.bboxret)
+		if self.bboxret:
+			self.canvas.delete(self.bboxret)
 		self.deleteallbox()
-		print(self.ImageBox)
-		self.ImageBox = []
-		self.ImageBoxupLabel = []
+		#print(self.ImageBox)
+		self.ImageBox.clear()
+		self.ImageBoxupLabel.clear()
 		self.bndboxattribute = []
 		self.classIDandclassname = {}
 		self.classID = {}
@@ -502,11 +515,12 @@ class MainPanelCreate():
 				messagebox.showwarning("Load Jump Warning","Input number is out of index!!")
 			else:
 				self.saveImagedata()
-				self.canvas.delete(self.bboxret)
+				if self.bboxret:
+					self.canvas.delete(self.bboxret)
 				self.deleteallbox()
 				self.removeallattribute()
-				self.ImageBox = []
-				self.ImageBoxupLabel = []
+				self.ImageBox.clear()
+				self.ImageBoxupLabel.clear()
 				self.bndboxattribute = []
 				self.classIDandclassname = {}
 				self.classID = {}
@@ -796,9 +810,6 @@ class MainPanelCreate():
 				self.BBOXListbox.insert(tk.END,'BOX{} :[LP:{},{} --> RD:{},{}]'.format(reassign,self.bndboxlist[reassign][0],self.bndboxlist[reassign][1],self.bndboxlist[reassign][2],self.bndboxlist[reassign][3]))
 			#print(self.ImageBox)
 	def deleteallbox(self):
-		#self.bndboxlist=[]#reset to none
-		#self.bndboxattribute = [] #reset to none
-		#print('====5====',self.boxcount)
 		size = self.BBOXListbox.size()
 		#print('listbox size:',size)
 		for plugout in range(size):
@@ -904,7 +915,7 @@ class MainPanelCreate():
 		self.Imgdata.append({'Path':self.ObjPath})
 		self.Imgdata.append({'IMGName':self.picturelist[self.flag]})
 		self.Imgdata.append({'Size':[self.Objimg.size[0],self.Objimg.size[1]]})
-		self.Imgdata.append({'Scale':[self.nsize[0],self.nsize[1]]})
+		self.Imgdata.append({'Scale':[self.nsize[0],self.nsize[1],self.ration]})
 		self.Imgdata.append(self.classIDandclassname)
 		self.Imgdata.append(self.classID)
 		#self.Imgdata.append(self.allclassID)
@@ -1045,7 +1056,7 @@ class MainPanelCreate():
 		with open(OutputPathname+jspath,'r') as file:
 			jsdata = json.load(file)
 		photo = jsdata[0]['Path']+jsdata[1]['IMGName']
-		ratio = jsdata[3]['Scale'][0]/jsdata[2]['Size'][0]
+		ratio = jsdata[3]['Scale'][2]
 		self.Objimg = Image.open(photo)
 		#print("ImageList Index:{}".format(self.flag))
 		self.nsize,self.ration = ScaleRation(self.Objimg.size)
