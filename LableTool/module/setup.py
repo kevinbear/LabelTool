@@ -4,7 +4,7 @@ executables = [cf.Executable("/Users/kevinkuo/Documents/GitHub/LabelTool/LableTo
 
 cf.setup(
     name = "Label_Maker",
-    options = {"build_exe" : {"packages":["tkinter","os","shutil","json","functools","PIL","zlib"],
-                                "include_files":["/Users/kevinkuo/Documents/GitHub/LabelTool/LableTool/src/white.png"]}},
+    options = {"build_exe" : {"includes":["tkinter","os","shutil","json","functools","PIL"],
+                                "include_files":["/Users/kevinkuo/Documents/GitHub/LabelTool/LableTool/src/"]}},
     executables = executables
 )
