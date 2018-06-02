@@ -991,6 +991,8 @@ class MainPanelCreate():
 					# check attribute status
 					if os.path.isdir('.attribute'):#path notice
 						tempfile = os.listdir('.attribute')#path notice
+						if '.DS_Store' in tempfile:
+							tempfile.remove('.DS_Store')
 						tempfile.sort()
 						if os.path.isfile('outlog.txt'):
 							os.remove('outlog.txt')
@@ -1020,6 +1022,8 @@ class MainPanelCreate():
 					# check attribute status
 					if os.path.isdir('.attribute'):#path notice
 						tempfile = os.listdir('.attribute')#path notice
+						if '.DS_Store' in tempfile:
+							tempfile.remove('.DS_Store')
 						tempfile.sort()
 						if os.path.isfile('outlog.txt'):
 							os.remove('outlog.txt')
