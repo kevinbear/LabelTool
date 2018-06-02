@@ -687,8 +687,10 @@ class MainPanelCreate():
 		(rgb,hx) = colorchooser.askcolor()
 		#self.class
 		#print(self.classcolorbutton[i])
-		self.classcolorbutton[i].destroy()
-		self.classcolorentry[i].config(bg=hx,text=hx)
+		print('line 690',hx)
+		if hx != None:
+			self.classcolorbutton[i].destroy()
+			self.classcolorentry[i].config(bg=hx,text=hx)
 		#self.colorchIndex.append(hx)
 	def deleteclass(self):
 		# use compare to remove unnecessary label and entry
